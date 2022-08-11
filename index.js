@@ -5,8 +5,8 @@ function getUid() {
 
 export class OneDItem {
 	constructor(props) {
-		for (let index = 0; index < this.fields.length; index++) {
-			const key = this.fields[index];
+		for (let index = 0; index < OneDItem.fields.length; index++) {
+			const key = OneDItem.fields[index];
 			if (props.hasOwnProperty(key)) {
 				this[key] = props[key];
 			} else {
@@ -81,6 +81,7 @@ export class OneDimensionalMap {
 
 	addRange(args) {
 		const { name, date, start, end } = args;
+		this.removeRange(start, end);
 
 		const overlaps = this.findRange(start, end);
 		if (!overlaps) {
@@ -90,7 +91,24 @@ export class OneDimensionalMap {
 			console.log(args, overlaps);
 		}
 	}
-	removeRange(id) {
+
+	removeRange(start, end) {
+		for (let index = this.array.length - 1; index >= 0; index--) {
+			const item = this.array[index];
+			if (item.start >= start && item.end <= end) {
+				this.array.splice(index, 1);
+			} else if (item.end > end && item.start < start) {
+				const originalEnd = item.end;
+				item.end = start - 1;
+				this.addRange({ ...item, start: end + 1, end: originalEnd });
+			} else if (item.start <= start && item.end >= start) {
+				item.end = start - 1;
+			} else if (item.start <= end && item.end >= end) {
+				item.end = end + 1;
+			}
+		}
+	}
+	removeRangeByID(id) {
 		for (let index = this.array.length - 1; index >= 0; index--) {
 			if (this.array[index].uuid === id) {
 				this.array.splice(index, 1);
@@ -111,6 +129,9 @@ export class OneDimensionalMap {
 		for (let index = 0; index < this.array.length; index++) {
 			output.push(this.array[index].serialized);
 		}
+		output.sort((a, b) => {
+			return a.start - b.start;
+		})
 		return output;
 	}
 
