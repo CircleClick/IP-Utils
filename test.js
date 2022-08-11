@@ -12,6 +12,12 @@ myMap.addRange({
 	start: 10,
 	end: 15,
 	name: "Second",
-	date: 0,
+	date: 1,
 })
-console.log(myMap.serialized);
+myMap.addRange({
+	start: 7,
+	end: 13,
+	name: "Third",
+	date: 2,
+})
+console.log(myMap.serialized, myMap.count);

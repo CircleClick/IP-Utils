@@ -62,16 +62,16 @@ export class OneDimensionalMap {
 		const output = [];
 		for (let index = 0; index < this.array.length; index++) {
 			const element = this.array[index];
-			if (element.start <= start && element.end >= end) {
+			if (element.start < start && element.end > end) {
 				//completely encompassing
 				output.push({ ...element, overlapType: 'encompassing' });
-			} else if (element.start <= start && element.end >= start) {
+			} else if (element.start < start && element.end > start) {
 				//overlaps start
 				output.push({ ...element, overlapType: 'start' });
-			} else if (element.start <= end && element.end >= end) {
+			} else if (element.start < end && element.end > end) {
 				//overlaps end
 				output.push({ ...element, overlapType: 'end' });
-			} else if (element.start >= start && element.end <= end) {
+			} else if (element.start > start && element.end < end) {
 				// completely encased
 				output.push({ ...element, overlapType: 'encased' });
 			}
@@ -95,16 +95,16 @@ export class OneDimensionalMap {
 	removeRange(start, end) {
 		for (let index = this.array.length - 1; index >= 0; index--) {
 			const item = this.array[index];
-			if (item.start >= start && item.end <= end) {
+			if (item.start > start && item.end < end) {
 				this.array.splice(index, 1);
 			} else if (item.end > end && item.start < start) {
 				const originalEnd = item.end;
-				item.end = start - 1;
-				this.addRange({ ...item, start: end + 1, end: originalEnd });
-			} else if (item.start <= start && item.end >= start) {
-				item.end = start - 1;
-			} else if (item.start <= end && item.end >= end) {
-				item.end = end + 1;
+				item.end = start;
+				this.addRange({ ...item, start: end, end: originalEnd });
+			} else if (item.start < start && item.end > start) {
+				item.end = start;
+			} else if (item.start < end && item.end > end) {
+				item.start = end;
 			}
 		}
 	}
