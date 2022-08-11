@@ -116,6 +116,14 @@ export class OneDimensionalMap {
 		}
 	}
 
+	getOrganizationCount(name) {
+		let count = 0;
+		for (let index = 0; index < this.array.length; index++) {
+			if (this.array[index] === name) count += this.array[index].count;
+		}
+		return count;
+	}
+
 	get count() {
 		let count = 0;
 		for (let index = 0; index < this.array.length; index++) {
