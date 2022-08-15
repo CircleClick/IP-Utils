@@ -4,7 +4,7 @@ const myMap = new OneDimensionalMap();
 
 myMap.addRange({
 	start: 0,
-	end: 100,
+	end: 255,
 	name: "First",
 	date: 0,
 })
@@ -20,4 +20,14 @@ myMap.addRange({
 	name: "Third",
 	date: 2,
 })
+myMap.addRange({
+	start: 16,
+	end: 20,
+	name: "Fourth",
+	date: 1,
+})
+
 console.log(myMap.serialized, myMap.count);
+
+if (myMap.count !== 256) console.error('Map count incorrect!');
+

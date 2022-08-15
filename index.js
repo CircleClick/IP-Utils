@@ -38,7 +38,7 @@ export class OneDItem {
 	}
 
 	get count() {
-		return this.end - this.start;
+		return this.end - this.start + 1;
 	}
 }
 
@@ -81,6 +81,9 @@ export class OneDimensionalMap {
 
 	addRange(args) {
 		const { name, date, start, end } = args;
+		if (args.start > args.end) {
+			throw new Error('Invalid range, start is greater than end');
+		}
 		this.removeRange(start, end);
 
 		const overlaps = this.findRange(start, end);
@@ -95,16 +98,19 @@ export class OneDimensionalMap {
 	removeRange(start, end) {
 		for (let index = this.array.length - 1; index >= 0; index--) {
 			const item = this.array[index];
-			if (item.start > start && item.end < end) {
+			if (item.start >= start && item.end <= end) {
 				this.array.splice(index, 1);
-			} else if (item.end > end && item.start < start) {
+			} else if (item.end >= end && item.start <= start) {
 				const originalEnd = item.end;
-				item.end = start;
-				this.addRange({ ...item, start: end, end: originalEnd });
-			} else if (item.start < start && item.end > start) {
-				item.end = start;
-			} else if (item.start < end && item.end > end) {
-				item.start = end;
+				item.end = start - 1;
+				if (item.start > item.end) this.array.splice(index, 1);
+				if (end + 1 < originalEnd) this.addRange({ ...item, start: end + 1, end: originalEnd });
+			} else if (item.start <= start && item.end >= start) {
+				item.end = start - 1;
+				if (item.start > item.end) this.array.splice(index, 1);
+			} else if (item.start <= end && item.end >= end) {
+				item.start = end + 1;
+				if (item.start > item.end) this.array.splice(index, 1);
 			}
 		}
 	}
