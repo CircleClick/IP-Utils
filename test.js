@@ -37,6 +37,8 @@ console.log(myMap.serialized, myMap.count);
 
 if (myMap.count !== 256) console.error('Map count incorrect!');
 
+console.log('Fourth has',myMap.getOrganizationCount('Fourth'));
+
 for (let index = 0; index < myMap.array.length; index++) {
 	const element = myMap.array[index];
 	if (element.name === 'ShouldNotExist') console.error('ShouldNotExist not properly destroyed!')
