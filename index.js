@@ -48,83 +48,139 @@ export class OneDimensionalMap {
 		this.array = new Array();
 	}
 
-	findCoord(coord) {
-		let output = [];
-		for (let index = 0; index < this.array.length; index++) {
+	recursiveFindIndex(x, start = 0, end = this.array.length - 1) {
+		if (start > end) return false;
+		let middleIndex = Math.floor((start + end) / 2);
+		if (this.array[middleIndex].start <= x && this.array[middleIndex].end >= x) return middleIndex;
+		if (this.array[middleIndex].start > x) return this.recursiveFindIndex(x, start, middleIndex - 1);
+		else return this.recursiveFindIndex(x, middleIndex + 1, end);
+	}
+
+	findStartIndex(target) {
+		if (this.array.length < 10) {
+			return 0;
+		}
+		return Math.max(0, this.recursiveFindIndex(target) - 3);
+	}
+
+	smartInsert(new_item) {
+		if (this.array.length === 0) {
+			this.array.push(new_item);
+			return;
+		}
+
+		if (this.findRange(new_item.start, new_item.end)) {
+			console.log('Uh oh, overlaps found');
+			console.log(this.findRange(new_item.start, new_item.end));
+			console.log(new_item);
+		}
+
+		const startIndex = this.findStartIndex(new_item.start);
+
+		for (let index = startIndex; index < this.array.length; index++) {
 			const element = this.array[index];
-			if (element.start <= coord && element.end >= coord) {
-				output.push(output);
+			if (element.start > new_item.start) {
+				this.array.splice(index, 0, new_item);
+				return;
+			}
+		}
+
+		this.array.push(new_item);
+	}
+
+	findRange(start, end) {
+		const output = [];
+
+		const startIndex = this.findStartIndex(start);
+
+		for (let index = startIndex; index < this.array.length; index++) {
+			const element = this.array[index];
+			if (element.start <= start && element.end >= end) {
+				//completely encompassing
+				output.push(element);
+			} else if (element.start <= start && element.end >= start) {
+				//overlaps start
+				output.push(element);
+			} else if (element.start <= end && element.end >= end) {
+				//overlaps end
+				output.push(element);
+			} else if (element.start >= start && element.end <= end) {
+				// completely encased
+				output.push(element);
 			}
 		}
 		return (output.length === 0) ? false : output;
 	}
 
-	findRange(start, end) {
-		const output = [];
-		for (let index = 0; index < this.array.length; index++) {
+	find(number) {
+		const startIndex = this.findStartIndex(number);
+		for (let index = startIndex; index < this.array.length; index++) {
 			const element = this.array[index];
-			if (element.start < start && element.end > end) {
-				//completely encompassing
-				output.push({ ...element, overlapType: 'encompassing' });
-			} else if (element.start < start && element.end > start) {
-				//overlaps start
-				output.push({ ...element, overlapType: 'start' });
-			} else if (element.start < end && element.end > end) {
-				//overlaps end
-				output.push({ ...element, overlapType: 'end' });
-			} else if (element.start > start && element.end < end) {
-				// completely encased
-				output.push({ ...element, overlapType: 'encased' });
+			if (element.start <= start && element.end >= end) {
+				return element;
 			}
 		}
-		return (output.length === 0) ? false : output;
+		return false;
 	}
 
 	addRange(args) {
 		const { date, start, end } = args;
 		if (args.start > args.end) {
-			throw new Error('Invalid range, start is greater than end');
+			if (args.start - args.end !== 1) { // unexpected difference
+				throw new Error('Invalid range, start is greater than end');
+			}
 		}
 		this.removeRange(start, end, date); // remove all overlapping items older than record
 
-		const overlaps = this.findRange(start, end);
-		if (!overlaps) {
-			this.array.push(new OneDItem(args));
+		const overlaps = this.findRange(start, end); // all overlaps will be newer since we called removeRange()
+		if (!overlaps || overlaps.length === 0) {
+			this.smartInsert(new OneDItem(args));
 		} else { // there are newer items overlapping, we need to shave down and split our record
-			const items = [{ ...args }]; //items to insert
-			for (let i = 0; i < overlaps.length; i++) {
-				const overlap = overlaps[i];
-
-				for (let o = items.length - 1; o >= 0; o--) {
-					const item = items[o];
-
-					if (item.start >= overlap.start && item.end <= overlap.end) {
-						items.splice(o, 1);
-					} else if (item.start < overlap.start && item.end > overlap.end) {
-						const ogEnd = item.end;
-						item.end = overlap.start - 1;
-						items.splice(0, 0, {
-							name: item.name,
-							date: item.date,
-							start: overlap.end,
-							end: ogEnd,
-						});
-						o++;
-					} else if (item.start < overlap.start && item.end > overlap.start) {
-						item.end = overlap.start - 1;
-					} else if (item.start < overlap.end && item.end > overlap.end) {
-						item.start = overlap.end + 1;
-					}
-				}
-			}
-			for (let index = 0; index < items.length; index++) {
-				this.array.push(new OneDItem(items[index]));
+			const item = { ...args }; //items to insert
+			const overlap = overlaps[0];
+			if (item.start >= overlap.start && item.end <= overlap.end) {
+				return;
+			} else if (item.start <= overlap.start && item.end >= overlap.end) {
+				this.addRange({
+					name: item.name,
+					date: item.date,
+					start: item.start,
+					end: overlap.start - 1,
+				})
+				this.addRange({
+					name: item.name,
+					date: item.date,
+					start: overlap.end + 1,
+					end: item.end,
+				});
+				return;
+			} else if (item.start <= overlap.start && item.end >= overlap.start) {
+				this.addRange({
+					name: item.name,
+					date: item.date,
+					start: item.start,
+					end: overlap.start - 1,
+				});
+				return;
+			} else if (item.start <= overlap.end && item.end >= overlap.end) {
+				this.addRange({
+					name: item.name,
+					date: item.date,
+					start: overlap.end + 1,
+					end: item.end,
+				});
+				return;
+			} else {
+				console.error('Unknown case');
+				console.log('trim this:', item, 'from that:', overlap);
 			}
 		}
 	}
 
 	removeRange(start, end, date) {
-		for (let index = this.array.length - 1; index >= 0; index--) {
+		const overlaps = this.findRange(start, end);
+
+		for (let index = 0; index < overlaps.length; index++) {
 			const item = this.array[index];
 			if (item.date.getTime() < new Date(date).getTime()) {
 				if (item.start >= start && item.end <= end) {
@@ -144,6 +200,7 @@ export class OneDimensionalMap {
 			}
 		}
 	}
+
 	removeRangeByID(id) {
 		for (let index = this.array.length - 1; index >= 0; index--) {
 			if (this.array[index].uuid === id) {
@@ -188,7 +245,7 @@ export class OneDimensionalMap {
 		const myMap = new OneDimensionalMap();
 
 		for (let index = 0; index < object.length; index++) {
-			myMap.array.push(OneDItem.deserialize(object[index]))
+			myMap.addRange(OneDItem.deserialize(object[index]))
 		}
 
 		return myMap;
