@@ -44,7 +44,8 @@ else console.log('Count of', myMap.count, 'is correct!');
 fs.writeFileSync('./output-1.json', JSON.stringify(myMap.serialized), {encoding: 'utf-8'})
 
 const ids = {};
-for (let index = 0; index < 100000; index++) {
+let start = Date.now();
+for (let index = 0; index < 1000000; index++) {
 	const start = Math.round(Math.random() * 10000);
 	const length = Math.round(Math.random() * 1000);
 	const id = "Random " + index;
@@ -56,6 +57,7 @@ for (let index = 0; index < 100000; index++) {
 	};
 	myMap.addRange(ids[id])
 }
+console.log('took', Date.now() - start, 'ms to add random ranges');
 myMap.addRange({ name: "Duplicate Example 1", date: 200, start: 2991, end: 2998 });
 myMap.addRange({ name: "Duplicate Example 2", date: 100, start: 2991, end: 2998 });
 myMap.addRange({ name: "Duplicate Example 3", date: 221, start: 2992, end: 2997 });
@@ -66,6 +68,7 @@ myMap.addRange({ start: 9998, end: 10998, name: 'Test 2', date: 9935 });
 
 
 let lastEnd = 0;
+start = Date.now();
 for (let index = 0; index < myMap.array.length; index++) {
 	const element = myMap.array[index];
 
@@ -83,6 +86,7 @@ for (let index = 0; index < myMap.array.length; index++) {
 
 	lastEnd = element.end;
 }
+console.log('took', Date.now() - start, 'ms to check for overlaps');
 
 
 fs.writeFileSync('./output-2.json', JSON.stringify(myMap.serialized), {encoding: 'utf-8'});
