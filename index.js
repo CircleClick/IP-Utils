@@ -60,7 +60,7 @@ export class OneDimensionalMap {
 		if (this.array.length < 10) {
 			return 0;
 		}
-		return Math.max(0, this.recursiveFindIndex(target) - 3);
+		return Math.max(0, this.recursiveFindIndex(target));
 	}
 
 	smartInsert(new_item) {
@@ -107,6 +107,8 @@ export class OneDimensionalMap {
 			} else if (element.start >= start && element.end <= end) {
 				// completely encased
 				output.push(element);
+			} else if (element.start > end) {
+				break;
 			}
 		}
 		return (output.length === 0) ? false : output;
@@ -118,6 +120,8 @@ export class OneDimensionalMap {
 			const element = this.array[index];
 			if (element.start <= start && element.end >= end) {
 				return element;
+			} else if (element.start > number) {
+				return false;
 			}
 		}
 		return false;

@@ -37,6 +37,7 @@ myMap.addRange({
 //console.log(myMap.serialized, myMap.count);
 
 if (myMap.count !== 256) console.error('Map count incorrect!', myMap.count);
+else console.log('Count of', myMap.count, 'is correct!');
 
 //console.log('Fourth has', myMap.getOrganizationCount('Fourth'));
 
@@ -84,4 +85,5 @@ for (let index = 0; index < myMap.array.length; index++) {
 }
 
 
-fs.writeFileSync('./output-2.json', JSON.stringify(myMap.serialized), {encoding: 'utf-8'})
+fs.writeFileSync('./output-2.json', JSON.stringify(myMap.serialized), {encoding: 'utf-8'});
+console.log('final count of', myMap.count);
