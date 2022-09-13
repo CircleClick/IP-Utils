@@ -248,7 +248,7 @@ export class OneDimensionalMap {
 		const myMap = new OneDimensionalMap();
 
 		for (let index = 0; index < object.length; index++) {
-			myMap.addRange(OneDItem.deserialize(object[index]))
+			myMap.addRange(object[index])
 		}
 
 		return myMap;
