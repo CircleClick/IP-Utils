@@ -247,8 +247,13 @@ export class OneDimensionalMap {
 
 		const myMap = new OneDimensionalMap();
 
+		let lastStart = 0;
 		for (let index = 0; index < object.length; index++) {
-			myMap.addRange(object[index])
+			myMap.array.push(new OneDItem(object[index]));
+			if (lastStart > object.start) {
+				throw new Error("Unsorted array detected");
+			}
+			lastStart = object.start;
 		}
 
 		return myMap;
