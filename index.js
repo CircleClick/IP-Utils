@@ -241,10 +241,9 @@ export class OneDimensionalMap {
 	}
 
 	static deserialize(input) {
-		let object;
+		let object = input;
 
 		if (typeof input === 'string') object = JSON.parse(input);
-		else if (typeof input === 'object') object = { ...input };
 
 		const myMap = new OneDimensionalMap();
 
