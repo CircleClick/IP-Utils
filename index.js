@@ -128,7 +128,8 @@ export class OneDimensionalMap {
 	}
 
 	addRange(args) {
-		const { date, start, end } = args;
+		let { date, start, end } = args;
+		date = new Date(date);
 		if (args.start > args.end) {
 			if (args.start - args.end !== 1) { // unexpected difference
 				throw new Error('Invalid range, start is greater than end');
