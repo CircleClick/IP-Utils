@@ -139,9 +139,9 @@ export class OneDimensionalMap {
 
 		const overlaps = this.findRange(start, end); // all overlaps will be newer since we called removeRange()
 		if (!overlaps || overlaps.length === 0) {
-			this.smartInsert(new OneDItem(args));
+			this.smartInsert(new OneDItem({ ...args, date }));
 		} else { // there are newer items overlapping, we need to shave down and split our record
-			const item = { ...args }; //items to insert
+			const item = { ...args, date }; //items to insert
 			const overlap = overlaps[0];
 			if (item.start >= overlap.start && item.end <= overlap.end) {
 				return;
