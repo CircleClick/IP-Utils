@@ -51,7 +51,7 @@ export class OneDimensionalMap {
 	recursiveFindIndex(x, start = 0, end = this.array.length - 1) {
 		if (start > end) return false;
 		let middleIndex = Math.floor((start + end) / 2);
-		if (this.array[middleIndex].start <= x && this.array[middleIndex].end >= x) return middleIndex;
+		if (this.array[middleIndex].start <= x && this.array[middleIndex].end >= x) return middleIndex - 1;
 		if (this.array[middleIndex].start > x) return this.recursiveFindIndex(x, start, middleIndex - 1);
 		else return this.recursiveFindIndex(x, middleIndex + 1, end);
 	}
