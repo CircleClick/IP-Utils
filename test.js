@@ -12,6 +12,7 @@ myMap.addRange({
 myMap.addRange({
 	start: 0,
 	end: 255,
+	comment: "test",
 	name: "First",
 	date: 1000,
 })
@@ -42,6 +43,7 @@ else console.log('Count of', myMap.count, 'is correct!');
 //console.log('Fourth has', myMap.getOrganizationCount('Fourth'));
 
 fs.writeFileSync('./output-1.json', JSON.stringify(myMap.serialized), {encoding: 'utf-8'})
+console.log(myMap.getCommentBreakdown('test'));
 
 const ids = {};
 let start = Date.now();

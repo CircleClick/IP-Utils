@@ -14,6 +14,9 @@ export class OneDItem {
 				throw new Error(`props.${key} cannot be undefined`)
 			}
 		}
+		if (props.hasOwnProperty('comment')) {
+			this.comment = props.comment;
+		}
 		this.uuid = getUid();
 	}
 
@@ -22,6 +25,7 @@ export class OneDItem {
 	get serialized() {
 		return {
 			name: this.name,
+			comment: this.comment,
 			date: this.date,
 			start: this.start,
 			end: this.end,
@@ -147,12 +151,14 @@ export class OneDimensionalMap {
 				return;
 			} else if (item.start <= overlap.start && item.end >= overlap.end) {
 				this.addRange({
+					...args,
 					name: item.name,
 					date: item.date,
 					start: item.start,
 					end: overlap.start - 1,
 				})
 				this.addRange({
+					...args,
 					name: item.name,
 					date: item.date,
 					start: overlap.end + 1,
@@ -161,6 +167,7 @@ export class OneDimensionalMap {
 				return;
 			} else if (item.start <= overlap.start && item.end >= overlap.start) {
 				this.addRange({
+					...args,
 					name: item.name,
 					date: item.date,
 					start: item.start,
@@ -169,6 +176,7 @@ export class OneDimensionalMap {
 				return;
 			} else if (item.start <= overlap.end && item.end >= overlap.end) {
 				this.addRange({
+					...args,
 					name: item.name,
 					date: item.date,
 					start: overlap.end + 1,
@@ -220,6 +228,20 @@ export class OneDimensionalMap {
 			if (this.array[index].name === name) count += this.array[index].count;
 		}
 		return count;
+	}
+	getCommentBreakdown(comment) {
+		const map = {};
+		for (let index = 0; index < this.array.length; index++) {
+			if (this.array[index].comment === comment) {
+				const key = this.array[index].name;
+				if (map.hasOwnProperty(key)) {
+					map[key] += this.array[index].count;
+				} else {
+					map[key] = this.array[index].count;
+				}
+			}
+		}
+		return map;
 	}
 
 	get count() {
